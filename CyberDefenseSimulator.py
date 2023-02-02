@@ -48,9 +48,10 @@ class OperatingSystem:
         self.vulneralbilities = Vulnerability(num)
         
     def getinfo(self):
-        print("OS id: " + self.id)
-        print("OS type: " + self.type)
-        print("OS version: " + self.verion)
+        print("OS id: " + self.getId)
+        print("OS type: " + self.getType)
+        print("OS version: " + self.getVersion)
+        print("OS vulneralbiblity: " + self.vulnerabilities.name)
 
 
 # App: Id, type, vulneralbility, version
@@ -74,9 +75,12 @@ class App:
         self.vulneralbilities = Vulnerability(num)
         
     def getinfo(self):
-        print("app id: " + self.id)
-        print("app type: " + self.type)
-        print("app version: " + self.verion)
+        print("app id: " + self.getId)
+        print("app type: " + self.getType)
+        print("app version: " + self.getVersion)
+        print("app vulneralbiblity: " + self.vulnerabilities.name)
+
+        
 
 # Device: OS, {app}, address
 class Device:
