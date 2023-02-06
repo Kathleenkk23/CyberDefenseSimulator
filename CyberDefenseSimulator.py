@@ -1,4 +1,4 @@
-from enum import Enum
+import copy
 #class CyberDefenseSimulator:
 
 # App: Id, type, vulneralbility, version
@@ -30,7 +30,7 @@ class OperatingSystem:
         self.id = id
         self.type = type
         self.version = version
-        self.vulnerabilities = Vulnerability.noVulneralbility
+        self.vulnerabilities = {}
 
     def getId(self):
         return self.id
@@ -58,7 +58,7 @@ class App:
         self.id = id
         self.type = type
         self.version = version
-        self.vulnerability = Vulnerability(0)
+        self.vulnerability = {}
 
     def getId(self):
         return self.id
@@ -69,15 +69,21 @@ class App:
     def getVersion(self):
         return self.version
     
-    def setVulnerabilities(self, num):
-        self.vulneralbility = Vulnerability(num)
+    def setVulnerabilities(self, Vul):
+        self.vulneralbility.add(Vul)
+        
+    def getVulnerabilities(self):
+        print("Vulternability of app id {" + self.id + "} includes:")
+        for vul in self.vulnerability:
+            print(vul)
+        return self.vulnerability
         
     def getinfo(self):
         stringId = str(self.getId())
         print("app id: " + stringId)
         print("app type: " + self.getType())
         print("app version: " + self.getVersion())
-        print("app vulneralbiblity: " + self.vulnerability.name)
+        print(self.getVulnerabilities)
 
         
 
@@ -87,6 +93,7 @@ class Device:
         self.OS = OS #operatingSystem
         self.apps = {}
         self.address = address
+        self.isCompromised = False
 
     def getAddress(self):
         return self.address
@@ -98,22 +105,74 @@ class Device:
         else:
             print("not an app")
             
+    def getIsCompromised(self):
+        return self.isCompromised
+    
+    def attackDevice(self):
+        if(self.isCompromised == False):
+            self.isCompromised = True
+            print("attacked successful")
+        else:
+            print("already compromised")
+    
+    def resetIsCompromise(self):
+        self.isCompromised = False
+    
+            
     def getinfo(self):
         print("device address: " + self.address)
         print("OS type: " + self.OS.type)
         print("OS version: " + self.OS.version)
-
-
-class Vulnerability(Enum):
-    noVulneralbility = 0
-    vultnerability1 = 1
-    vultnerability2 = 2
-    vultnerability3 = 3
+    
+class Vulnerability:
+    def __init__(self, id, os, app, minRange, maxRange):
+        self.id = id
+        self.OS = os
+        self.app = app
+        self.type = type #known, unknwon
+        self.versionMin = minRange
+        self.versionMax = maxRange
+        
+class Exploit:
+    def __init__(self, target, type):
+        self.target = target #set of targets
+        self.type = type
+        self.versionMin
+        self.versionMax
+    
+    def setRange(self, minRange, maxRange):
+        self.versionMin = minRange
+        self.versionMax = maxRange
+        
+    def getInfo(self):
+        print(f'os is')
+        print(f'')
 
 
 # Subnet: set of devices
-subnet = {}
+class Subnet:
+    def __init__(self):
+        self.subnet = {}
+        self.numOfCompromised = 0
 
+    def addDevices(self, device):
+        if isinstance(device, Device):
+            self.subnet.add(device)
+            print("device "+str(device.getID)+" added successfully")
+        else:
+            print("not a device")
+    
+    def attack(self, exploit):
+        if isinstance(exploit, Exploit):  
+            # exploit.target   
+            print("attacking" + exploit.target)
+            self.numOfCompromised += len(exploit.target)
+        else:
+            print("not an exploit, invalid parameter") 
+    
+    def getCompromisedNum(self):
+        return self.getCompromisedNum
+            
 # network: set of subnet
 network = {}
 
