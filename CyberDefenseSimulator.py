@@ -13,7 +13,7 @@ from enum import Enum
 
 #class CyberDefenseSimulator
 class CyberDefenseSimulator:
-    def init(self):
+    def __init__(self):
         # Subnet: set of devices
         self.subnet = {}
         # network: set of subnet
@@ -26,41 +26,39 @@ class CyberDefenseSimulator:
 
 # OS: ID, type, version, vulnerabilities
 class OperatingSystem:
-    def init(self, id, type, verson):
+    def __init__(self, id, type, version):
         self.id = id
         self.type = type
-        self.verson = verson
+        self.version = version
         self.vulnerabilities = Vulnerability.noVulneralbility
 
     def getId(self):
-        print("OS id: " + self.id)
         return self.id
 
     def getType(self):
-        print("OS type: " + self.type)
         return self.type
 
     def getVersion(self):
-        print("OS version: " + self.verion)
         return self.version
     
     def setVulnerabilities(self, num):
-        self.vulneralbilities = Vulnerability(num)
+        self.vulnerabilities = Vulnerability(num)
         
     def getinfo(self):
-        print("OS id: " + self.getId)
-        print("OS type: " + self.getType)
-        print("OS version: " + self.getVersion)
+        stringId = str(self.getId())
+        print("OS id: " + stringId)
+        print("OS type: " + self.getType())
+        print("OS version: " + self.getVersion())
         print("OS vulneralbiblity: " + self.vulnerabilities.name)
 
 
 # App: Id, type, vulneralbility, version
 class App:
-    def init(self, id, type, verson):
+    def __init__(self, id, type, version):
         self.id = id
         self.type = type
-        self.verson = verson
-        self.vulnerability = Vulnerability.noVulneralbility
+        self.version = version
+        self.vulnerability = Vulnerability(0)
 
     def getId(self):
         return self.id
@@ -72,19 +70,20 @@ class App:
         return self.version
     
     def setVulnerabilities(self, num):
-        self.vulneralbilities = Vulnerability(num)
+        self.vulneralbility = Vulnerability(num)
         
     def getinfo(self):
-        print("app id: " + self.getId)
-        print("app type: " + self.getType)
-        print("app version: " + self.getVersion)
-        print("app vulneralbiblity: " + self.vulnerabilities.name)
+        stringId = str(self.getId())
+        print("app id: " + stringId)
+        print("app type: " + self.getType())
+        print("app version: " + self.getVersion())
+        print("app vulneralbiblity: " + self.vulnerability.name)
 
         
 
 # Device: OS, {app}, address
 class Device:
-    def init(self, OS, address):
+    def __init__(self, OS, address):
         self.OS = OS #operatingSystem
         self.apps = {}
         self.address = address
@@ -94,15 +93,15 @@ class Device:
     
     def addApps(self, appName):
         if isinstance(appName, App):
-            self.apps.add(appName)
-            print("app added successfully")
+            self.apps[appName.getId()] = App
+            print("app "+str(appName.getId())+" added successfully")
         else:
             print("not an app")
             
     def getinfo(self):
         print("device address: " + self.address)
         print("OS type: " + self.OS.type)
-        print("OS version: " + self.OS.verion)
+        print("OS version: " + self.OS.version)
 
 
 class Vulnerability(Enum):
@@ -117,3 +116,20 @@ subnet = {}
 
 # network: set of subnet
 network = {}
+
+def main():
+    testOS = OperatingSystem(1234, "someOS", "1.1.1")
+    testOS.setVulnerabilities(3)
+    testOS.getinfo()
+    print('\n')
+    testApp = App(1, "email", "1.0")
+    testApp.getinfo()
+    print('\n')
+    testDevice = Device(testOS, "10.0.0")
+    testDevice.getinfo()
+    testDevice.addApps(testApp)
+    
+
+
+if __name__ == "__main__":
+    main()
