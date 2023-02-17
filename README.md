@@ -22,17 +22,17 @@ set up a simulator
 - make up random os, app(diff version), each with set a vulnerability 
 - vul <-> one app, or one os, but a seq of version
 
-class exploit:
+class exploit: (implmented)
 - target, data type -> vul
 - function: tells which os, system
 - function: a range for highest version, lowest version
 
-class subnet:
+class subnet:(implemented)
 set of devices
 attack method -> exploit as argumet, attacks all device
 getCompromise num -> returns # of compromised devices
 
-device class -> implement attack, return true or false
+device class -> implement attack, return true or false (implemented)
 internal state of the device -> underattack
 another method: isCompromise -> t or f
 reset: resets attack state to f (deep copy)

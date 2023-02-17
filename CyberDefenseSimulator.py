@@ -41,9 +41,26 @@ class OperatingSystem:
     def getVersion(self):
         return self.version
     
-    def setVulnerabilities(self, num):
-        self.vulnerabilities = Vulnerability(num)
-        
+    def addVulnerability(self, vul):
+        if isinstance(vul, Vulnerability):
+            if vul in self.vulnerabilities:
+                print("already contain the Vulnerability")
+            else:
+                self.vulnerabilities.add(vul)
+                print("Vulnerability "+str(vul.getID)+" added successfully")
+        else:
+            print("not a Vulnerability")
+    
+    def removeVulnerabilitiy(self, vul):
+        if isinstance(vul, Vulnerability):
+            if vul in self.vulnerabilities:
+                self.vulnerabilities.remove(vul)
+                print("Vulnerability "+str(vul.getID)+" removed successfully")
+            else:
+                print("doesn't contain the Vulnerability")
+        else:
+            print("not a Vulnerability")
+            
     def getinfo(self):
         stringId = str(self.getId())
         print("OS id: " + stringId)
@@ -109,11 +126,13 @@ class Device:
         return self.isCompromised
     
     def attackDevice(self):
-        if(self.isCompromised == False):
+        if(self.getIsCompromised == False):
             self.isCompromised = True
             print("attacked successful")
+            return True
         else:
             print("already compromised")
+            return False
     
     def resetIsCompromise(self):
         self.isCompromised = False
@@ -125,28 +144,39 @@ class Device:
         print("OS version: " + self.OS.version)
     
 class Vulnerability:
-    def __init__(self, id, os, app, minRange, maxRange):
+    def __init__(self, id, os, vulType, targetApp):
         self.id = id
         self.OS = os
-        self.app = app
-        self.type = type #known, unknwon
-        self.versionMin = minRange
-        self.versionMax = maxRange
-        
-class Exploit:
-    def __init__(self, target, type):
-        self.target = target #set of targets
-        self.type = type
-        self.versionMin
-        self.versionMax
+        self.targetApp = targetApp
+        self.type = vulType #known, unknwon
+        self.versionMin = float('inf')
+        self.versionMax = float('-inf')
+    
+    def getID(self):
+        return self.id
     
     def setRange(self, minRange, maxRange):
         self.versionMin = minRange
         self.versionMax = maxRange
         
     def getInfo(self):
-        print(f'os is')
-        print(f'')
+        print(f'type is {self.type}')
+        print(f'range is min: {self.versionMin} and max: {self.versionMax}')
+        
+class Exploit:
+    def __init__(self, target, expType):
+        self.target = target #set of targets
+        self.type = expType
+        self.versionMin = float('inf')
+        self.versionMax = float('-inf')
+    
+    def setRange(self, minRange, maxRange):
+        self.versionMin = minRange
+        self.versionMax = maxRange
+        
+    def getInfo(self):
+        print(f'type is {self.type}')
+        print(f'range is min: {self.versionMin} and max: {self.versionMax}')
 
 
 # Subnet: set of devices
