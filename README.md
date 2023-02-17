@@ -38,6 +38,6 @@ another method: isCompromise -> t or f
 reset: resets attack state to f (deep copy)
 -  resetdefault to default application
 
-class vulnerability:
+class vulnerability:(implmented)
 id, os, app, version range that it can attack,
 initialized the os and device to the same default vulnerability
