@@ -25,7 +25,7 @@ class CyberDefenseSimulator:
     def generateDevices(self, numOfDevice):
         if type(numOfDevice)==int:
             for count in range(numOfDevice):
-                newDevice = Device(count, OperatingSystem(count, "unkown", 0), 0)
+                newDevice = Device(count, OperatingSystem(count, "unknown", 0), 0)
                 self.subnet.add(newDevice)
         else:
             print("not a valid input")
@@ -33,7 +33,7 @@ class CyberDefenseSimulator:
     def generateVul(self, numOfVul):
         if type(numOfVul)==int:
             for count in range(numOfVul):
-                newVul = Vulnerability(count, OperatingSystem(count, "unkown", 0), "unknown", App(count, "email", "1.0"))
+                newVul = Vulnerability(count, OperatingSystem(count, "unknown", 0), "unknown", App(count, "email", "1.0"))
                 self.vulneralbilities.add(newVul)
         else:
             print("not a valid input")
@@ -188,9 +188,14 @@ class Device:
             print("attacked successful")
             self.isCompromised = True
             return True
-        else:
-            print("already compromised")
-            return False
+
+    def attackDevice(self, exploit):
+        # check if device vulnerable to exploit
+        
+        # if not vulnerable, return false
+        
+        # if vulnerable:
+        return self.attackDevice()
 
     def resetIsCompromise(self):
         self.isCompromised = False
@@ -275,14 +280,16 @@ class Subnet:
         else:
             print("not a device")
 
-    def attack(self, exploit):
+    def attack(self, exploit, targetDevices):
         if isinstance(exploit, Exploit):
             # exploit.target
             print("attacking: ")
-            for i, target in exploit.target.items():
+            for i, target in targetDevices:
+            #exploit.target.items():
                 if(i in self.subnet.keys()):
-                    self.subnet.get(i).attackDevice()
-                    self.numOfCompromised += 1
+                    success = self.subnet.get(i).attackDevice(exploit)
+                    if success:
+                        self.numOfCompromised += 1
 
         else:
             print("not an exploit, invalid parameter")
