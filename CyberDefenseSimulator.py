@@ -21,33 +21,47 @@ class CyberDefenseSimulator:
         # network: set of subnet
         self.network = set()
         self.vulneralbilities = set()
-        
+        self.exploits = set()
+
+
     def generateDevices(self, numOfDevice):
-        if type(numOfDevice)==int:
+        if type(numOfDevice) == int:
             for count in range(numOfDevice):
-                newDevice = Device(count, OperatingSystem(count, "unknown", 0), 0)
+                newDevice = Device(
+                    count, OperatingSystem(count, "unknown", 0), 0)
                 self.subnet.add(newDevice)
         else:
             print("not a valid input")
-            
+
     def generateVul(self, numOfVul):
-        if type(numOfVul)==int:
+        if type(numOfVul) == int:
             for count in range(numOfVul):
-                newVul = Vulnerability(count, OperatingSystem(count, "unknown", 0), "unknown", App(count, "email", "1.0"))
+                newVul = Vulnerability(count, OperatingSystem(
+                    count, "unknown", 0), "unknown", App(count, "email", "1.0"))
                 self.vulneralbilities.add(newVul)
         else:
             print("not a valid input")
-            
+    
+    def generateExploits(self, numOfExploits):
+        if type(numOfExploits) == int:
+            for count in range(numOfExploits):
+                newExploits = Exploit("unknown");
+                
+                self.subnet.add(newExploits)
+        else:
+            print("not a valid input")
 
     def getinfo(self):
         print("subnet : ")
         for device in self.subnet:
-            print("\t device id: "+ str(device.getId()))
+            print("\t device id: " + str(device.getId()))
         print("vulnerabilities : ")
         for vul in self.vulneralbilities:
-            print("\t vulnerability id: "+ str(vul.getId()))
+            print("\t vulnerability id: " + str(vul.getId()))
 
 # OS: ID, type, version, vulnerabilities
+
+
 class OperatingSystem:
     def __init__(self, id, type, version):
         self.id = id
@@ -89,9 +103,9 @@ class OperatingSystem:
         print("OS id: " + stringId)
         print("OS type: " + self.getType())
         print("OS version: " + self.getVersion())
-        print("OS vulneralbiblity: " )
+        print("OS vulneralbiblity: ")
         for vulId, vul in self.vulnerabilities.items():
-            print("\tvul id: "+ str(vul.getId()))
+            print("\tvul id: " + str(vul.getId()))
 
 
 # App: Id, type, vulneralbility, version
@@ -142,10 +156,9 @@ class App:
         print("app id: " + stringId)
         print("app type: " + self.getType())
         print("app version: " + self.getVersion())
-        print("app vulneralbiblity: " )
+        print("app vulneralbiblity: ")
         for vulId, vul in self.vulnerabilities.items():
-            print("\tvul id: "+ str(vul.getId()))
-        
+            print("\tvul id: " + str(vul.getId()))
 
 
 # Device: OS, {app}, address
@@ -156,7 +169,7 @@ class Device:
         self.apps = {}
         self.address = address
         self.isCompromised = False
-        
+
     def getId(self):
         return self.id
 
@@ -169,7 +182,7 @@ class Device:
             print("app "+str(appName.getId())+" added successfully")
         else:
             print("not an app")
-    
+
     def removeApp(self, appName):
         if isinstance(appName, App):
             if appName.getId() in self.apps.keys():
@@ -191,9 +204,9 @@ class Device:
 
     def attackDevice(self, exploit):
         # check if device vulnerable to exploit
-        
+
         # if not vulnerable, return false
-        
+
         # if vulnerable:
         return self.attackDevice()
 
@@ -206,9 +219,9 @@ class Device:
         print("device address: " + self.getAddress())
         print("device OS type: " + self.OS.type)
         print("device OS version: " + self.OS.version)
-        print("device apps: " )
+        print("device apps: ")
         for appID, app in self.apps.items():
-            print("\t app id: "+ str(app.getId()))
+            print("\t app id: " + str(app.getId()))
 
 
 class Vulnerability:
@@ -233,24 +246,29 @@ class Vulnerability:
 
 
 class Exploit:
-    def __init__(self, expType):
+    def __init__(self, id, expType):
+        self.id = id
         self.target = {}  # dict of target devices
-        self.type = expType # known and unknown
+        self.type = expType  # known and unknown
         self.versionMin = float('inf')
         self.versionMax = float('-inf')
-
-    # assume targets is a list/set of devices
-    def setTarget(self, targetDevices): 
-        for target in targetDevices:
-            if isinstance(target, Device):
-                if target.getId() in self.target.keys():
+        
+    def getId(self):
+        return self.id
+    
+    # assume targets is a list/set of vulnerabilities
+    def setTarget(self, targetVul):
+        for vul in targetVul:
+            if isinstance(vul, Vulnerability):
+                if vul.getId() in self.target.keys():
                     continue
                 else:
-                    self.target.update({target.getId() : target})
-                    print("target device "+str(target.getId())+" added successfully")
+                    self.target.update({vul.getId(): vul})
+                    print("target vul "+str(vul.getId()) +
+                          " added successfully")
             else:
-                print("not a device")
-        
+                print("not a valid vul target")
+
     def setRange(self, minRange, maxRange):
         self.versionMin = minRange
         self.versionMax = maxRange
@@ -258,9 +276,9 @@ class Exploit:
     def getInfo(self):
         print(f'type is {self.type}')
         print(f'range is min: {self.versionMin} and max: {self.versionMax}')
-        print("targeted apps: " )
+        print("targeted apps: ")
         for targetID, targetApp in self.target.items():
-            print("\t target id: "+ str(targetApp.getId()))
+            print("\t target id: " + str(targetApp.getId()))
 
 
 # Subnet: set of devices
@@ -270,7 +288,7 @@ class Subnet:
         self.numOfCompromised = 0
 
     def addDevices(self, device):
-        if type(device)==list:
+        if type(device) == list:
             for dev in device:
                 self.subnet.update({dev.getId(): dev})
                 print("device "+str(dev.getId())+" added successfully")
@@ -285,7 +303,7 @@ class Subnet:
             # exploit.target
             print("attacking: ")
             for i, target in targetDevices:
-            #exploit.target.items():
+                # exploit.target.items():
                 if(i in self.subnet.keys()):
                     success = self.subnet.get(i).attackDevice(exploit)
                     if success:
@@ -296,9 +314,9 @@ class Subnet:
 
     def getCompromisedNum(self):
         return self.numOfCompromised
-        
+
     def getinfo(self):
-        print("num of compromised: "+ str(self.getCompromisedNum()))
+        print("num of compromised: " + str(self.getCompromisedNum()))
         print("subnet devices:")
         for deviceid, device in self.subnet.items():
             print("\t device id: " + str(deviceid))
@@ -306,4 +324,3 @@ class Subnet:
 
 # network: set of subnet
 network = {}
-

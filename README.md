@@ -44,16 +44,18 @@ initialized the os and device to the same default vulnerability
 
 
 notes feb 21:
-- Exploit class: target should be vul instead of device
+- Exploit class: target should be vul instead of device (implemented)
 - vul <-> one app, or one os (target one thing), but a seq of version
     - constraint can be implmented in vulnerability; make sure vulnerability not assigned multiple times.
     - problem: multiple version having the same vulnerability, violates the constraint.
-- attacker(new)
-
 
 - python unit testing for simulator
     - generate exploit, pick one exploit, check the compromised device
     - typicial inputs and unnormal inputs
     - output plot of the result (time vs numebr of compromised devices)
 
-- github repo
+- github repo (implemented)
+
+
+notes march:
+- attacker (new)
