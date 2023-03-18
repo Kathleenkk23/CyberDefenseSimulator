@@ -45,7 +45,7 @@ initialized the os and device to the same default vulnerability
 
 notes feb 21:
 - Exploit class: target should be vul instead of device (implemented)
-- vul <-> one app, or one os (target one thing), but a seq of version
+- vul <-> one app, or one os (target one thing), but a seq of version (implemented)
     - constraint can be implmented in vulnerability; make sure vulnerability not assigned multiple times.
     - problem: multiple version having the same vulnerability, violates the constraint.
 

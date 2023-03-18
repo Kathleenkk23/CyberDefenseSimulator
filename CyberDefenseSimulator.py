@@ -175,13 +175,24 @@ class Device:
 
     def getAddress(self):
         return self.address
+    
+    def getApps(self):
+        return self.apps
 
-    def addApps(self, appName):
+    def addSingleApp(self, appName):
         if isinstance(appName, App):
             self.apps[appName.getId()] = appName
             print("app "+str(appName.getId())+" added successfully")
         else:
             print("not an app")
+    
+    #Apps is a name
+    def addApps(self, Apps):
+        if isinstance(Apps, list):
+            for app in Apps:
+                self.addSingleApp(app)
+        else:
+            print("not a valid app list")
 
     def removeApp(self, appName):
         if isinstance(appName, App):
@@ -196,19 +207,23 @@ class Device:
     def getIsCompromised(self):
         return self.isCompromised
 
-    def attackDevice(self):
+    def attackSingleDevice(self):
         if(self.getIsCompromised() == False):
             print("attacked successful")
             self.isCompromised = True
             return True
 
-    def attackDevice(self, exploit):
+    def attackDevices(self, exploit):
+        if isinstance(exploit, Exploit)!=True:
+            print("not a valid exploit")
+            return False
         # check if device vulnerable to exploit
-
-        # if not vulnerable, return false
-
-        # if vulnerable:
-        return self.attackDevice()
+        if self.getIsCompromised():
+            # if not vulnerable, return false
+            return True
+            # if vulnerable:
+        else:
+            return self.attackSingleDevice()
 
     def resetIsCompromise(self):
         self.isCompromised = False
@@ -225,20 +240,41 @@ class Device:
 
 
 class Vulnerability:
-    def __init__(self, id, os, vulType, targetApp):
+    def __init__(self, id, os, vulType, target, minR, maxR):
         self.id = id
         self.OS = os
-        self.targetApp = targetApp
+        # vul <-> one app, or one os (target 1 thing), but a seq of version
+        self.Vultarget = None
+        self.setTarget(target)
         self.type = vulType  # known, unknwon
-        self.versionMin = float('inf')
-        self.versionMax = float('-inf')
+        self.versionMin = None
+        self.versionMax = None
+        self.setRange(minR, maxR)
 
     def getId(self):
         return self.id
+    
+    def getMax(self):
+        return self.versionMax
+    
+    def getMin(self):
+        return self.versionMin
 
-    def setRange(self, minRange, maxRange):
-        self.versionMin = minRange
-        self.versionMax = maxRange
+    def setRange(self, minRange=None, maxRange=None):
+        if minRange is not None:
+            self.versionMin = minRange
+        if maxRange is not None:
+            self.versionMax = maxRange
+        
+    def setTarget(self, target):            
+        if isinstance(target, Vulnerability) or isinstance(target, App):
+            if self.Vultarget!= None:
+                print("already assigned vulnerability")
+            else:
+                self.Vultarget = target
+            
+        else:
+            print("not a valid vul target")
 
     def getInfo(self):
         print(f'type is {self.type}')
@@ -246,18 +282,31 @@ class Vulnerability:
 
 
 class Exploit:
-    def __init__(self, id, expType):
+    def __init__(self, id, expType, minR, maxR):
         self.id = id
         self.target = {}  # dict of target devices
         self.type = expType  # known and unknown
-        self.versionMin = float('inf')
-        self.versionMax = float('-inf')
-        
+        self.versionMin = None
+        self.versionMax = None
+        self.setRange(minR, maxR)
+
     def getId(self):
         return self.id
     
+    def getMax(self):
+        return self.versionMax
+    
+    def getMin(self):
+        return self.versionMin
+
+    def setRange(self, minRange=None, maxRange=None):
+        if minRange is not None:
+            self.versionMin = minRange
+        if maxRange is not None:
+            self.versionMax = maxRange
+    
     # assume targets is a list/set of vulnerabilities
-    def setTarget(self, targetVul):
+    def setTargetVul(self, targetVul):
         for vul in targetVul:
             if isinstance(vul, Vulnerability):
                 if vul.getId() in self.target.keys():
@@ -268,10 +317,6 @@ class Exploit:
                           " added successfully")
             else:
                 print("not a valid vul target")
-
-    def setRange(self, minRange, maxRange):
-        self.versionMin = minRange
-        self.versionMax = maxRange
 
     def getInfo(self):
         print(f'type is {self.type}')
@@ -298,14 +343,15 @@ class Subnet:
         else:
             print("not a device")
 
+    # targetDevices is a list
     def attack(self, exploit, targetDevices):
         if isinstance(exploit, Exploit):
             # exploit.target
             print("attacking: ")
-            for i, target in targetDevices:
+            for target in targetDevices:
                 # exploit.target.items():
-                if(i in self.subnet.keys()):
-                    success = self.subnet.get(i).attackDevice(exploit)
+                if(target.getId() in self.subnet.keys()):
+                    success = self.subnet.get(target.getId()).attackSingleDevice(exploit)
                     if success:
                         self.numOfCompromised += 1
 
