@@ -209,11 +209,11 @@ class Device:
 
     def attackSingleDevice(self):
         if(self.getIsCompromised() == False):
-            print("attacked successful")
+            print(f'Device {self.getId()} attacked successful')
             self.isCompromised = True
             return True
 
-    def attackDevices(self, exploit):
+    def attackDevice(self, exploit):
         if isinstance(exploit, Exploit)!=True:
             print("not a valid exploit")
             return False
@@ -351,13 +351,16 @@ class Subnet:
             for target in targetDevices:
                 # exploit.target.items():
                 if(target.getId() in self.subnet.keys()):
-                    success = self.subnet.get(target.getId()).attackSingleDevice(exploit)
+                    success = self.subnet.get(target.getId()).attackDevice(exploit)
                     if success:
                         self.numOfCompromised += 1
 
         else:
             print("not an exploit, invalid parameter")
 
+    def getDeviceNumber(self):
+        return self.len(subnet)
+    
     def getCompromisedNum(self):
         return self.numOfCompromised
 

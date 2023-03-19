@@ -26,6 +26,7 @@ class CDSFunction(unittest.TestCase):
         #testing subnet
         self.testingSubnet = Subnet()
 
+
         
     def testingOS(self):
         self.assertEqual(self.testOS.getId(), 1234)
@@ -44,13 +45,26 @@ class CDSFunction(unittest.TestCase):
         self.defaultVul.setRange(None,"1.3")
         self.assertEqual(self.defaultVul.getMin(), "1.0")
         self.assertEqual(self.defaultVul.getMax(), "1.3")
+    
+    def testAddVulToOS(self):
+        #adding vulnerability to Operating System
+        self.testOS.addVulnerability(self.defaultVul)
+        self.assertEqual(self.testOS.vulnerabilities, {1:self.defaultVul})
+        self.testOS.removeVulnerability(self.defaultVul)
+        self.assertEqual(self.testOS.vulnerabilities, {})
+        self.testOS.addVulnerability(self.defaultVul)
+        self.testOS.addVulnerability(self.defaultVul)
+        self.assertEqual(self.testOS.vulnerabilities, {1:self.defaultVul})
         
     def testDevice(self):
         self.assertEqual(self.testDevice1.getId(), 1)
         self.assertEqual(self.testDevice1.getAddress(), "10.0.0")
         self.testDevice1.addApps(self.targetApps)
         self.assertEqual(self.testDevice1.getApps(), {1:self.testApp1, 2:self.testApp2, 3:self.testApp3})
-        
+            #adding apps
+    # testingDevice.addApps(testApp)
+    # testingDevice.getinfo()
+    
     def testExploit(self):
         self.assertEqual(self.testExploit.getMin(), "1.0")
         self.assertEqual(self.testExploit.getMax(), "1.5")
@@ -59,21 +73,8 @@ class CDSFunction(unittest.TestCase):
     def testSubnet(self):
         self.testingSubnet.addDevices(self.deviceSamples)
         self.testingSubnet.attack(self.testExploit, self.targetDevices)
+        self.assertEqual(self.testingSubnet.getCompromisedNum(), 3)
         
-#     #adding vulnerability
-#     # testOS.addVulnerability(defaultVul)
-#     # testOS.getinfo()
-#     # testOS.removeVulnerability(defaultVul)
-#     # testOS.getinfo()
-#     # testApp.addVulnerability(defaultVul)
-#     # testApp.addVulnerability(testVul)
-#     # testApp.removeVulnerability(defaultVul)
-#     # testApp.getinfo()
-    
-#     #adding apps
-#     # testingDevice.addApps(testApp)
-#     # testingDevice.getinfo()
-    
 #     #test cybersimulator
 #     testingCyberdenSimulator = CyberDefenseSimulator()
 #     testingCyberdenSimulator.generateDevices(10)
@@ -81,6 +82,6 @@ class CDSFunction(unittest.TestCase):
 #     testingCyberdenSimulator.getinfo()
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=0)
 
 
