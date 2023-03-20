@@ -22,13 +22,27 @@ class CyberDefenseSimulator:
         self.network = set()
         self.vulneralbilities = set()
         self.exploits = set()
+        self.defaultOS = OperatingSystem(1, "OS", "1.0")
+        self.defaultApp = App(1, "email", "1.0")
 
-
+    def getSubnetSize(self):
+        return len(self.subnet)
+    
+    def getNetworkSize(self):
+        return len(self.network)
+    
+    def getVulneralbilitiesSize(self):
+        return len(self.vulneralbilities)
+    
+    def getExploitsSize(self):
+        return len(self.exploits)
+    
+    # add to subnet
     def generateDevices(self, numOfDevice):
         if type(numOfDevice) == int:
             for count in range(numOfDevice):
                 newDevice = Device(
-                    count, OperatingSystem(count, "unknown", 0), 0)
+                    count, self.defaultOS, 0)
                 self.subnet.add(newDevice)
         else:
             print("not a valid input")
@@ -36,8 +50,7 @@ class CyberDefenseSimulator:
     def generateVul(self, numOfVul):
         if type(numOfVul) == int:
             for count in range(numOfVul):
-                newVul = Vulnerability(count, OperatingSystem(
-                    count, "unknown", 0), "unknown", App(count, "email", "1.0"))
+                newVul = Vulnerability(count, self.defaultOS, "unknown", self.defaultApp, "1.0", "1.1")
                 self.vulneralbilities.add(newVul)
         else:
             print("not a valid input")
@@ -45,9 +58,9 @@ class CyberDefenseSimulator:
     def generateExploits(self, numOfExploits):
         if type(numOfExploits) == int:
             for count in range(numOfExploits):
-                newExploits = Exploit("unknown");
+                newExploits = Exploit(count, "unknown", "1.0", "1.1");
                 
-                self.subnet.add(newExploits)
+                self.exploits.add(newExploits)
         else:
             print("not a valid input")
 
@@ -58,9 +71,13 @@ class CyberDefenseSimulator:
         print("vulnerabilities : ")
         for vul in self.vulneralbilities:
             print("\t vulnerability id: " + str(vul.getId()))
+        print("exploits : ")
+        for exp in self.exploits:
+            print("\t exploits id: " + str(exp.getId()))
+
+
 
 # OS: ID, type, version, vulnerabilities
-
 
 class OperatingSystem:
     def __init__(self, id, type, version):

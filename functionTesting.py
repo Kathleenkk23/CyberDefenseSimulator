@@ -1,8 +1,25 @@
 import unittest
 from CyberDefenseSimulator import * 
 
+"""
+App: Id, type, vulneralbility, version
+OS: ID, type, version, vulnerabilities
+Device: OS, {app}, address
+Subnet: set of devices
+network: set of subnet
+explicit: vulnerability, OS, app
+workflow: source, test, size(# of steps)
+OS: Id, type, version, vulnerabilities
+Vulnerability
+"""
+
+
 class CDSFunction(unittest.TestCase):
+    
     def setUp(self):
+        """
+        setUp iniitialize of 
+        """
         # testing OS: __init__(self, id, type, version)
         self.testOS = OperatingSystem(1234, "known", "1.1.1")
         # testing App: __init__(self, id, type, version)
@@ -21,10 +38,12 @@ class CDSFunction(unittest.TestCase):
         self.targetVul = [self.defaultVul, self.testVul]
         self.targetDevices = [self.testDevice1, self.testDevice2, self.testDevice3]
         self.deviceSamples = [self.testDevice1, self.testDevice2, self.testDevice3, self.testDevice4]
-        # testing exploit: __init__(self, id, expType)
+        # testing exploit: __init__(self, id, expType, minR, maxR):
         self.testExploit = Exploit(1, "unknown", "1.0", "1.5")
-        #testing subnet
-        self.testingSubnet = Subnet()
+        #testing subnet: __init__(self)
+        self.testSubnet = Subnet()
+        #test cybersimulator: __init__(self)
+        self.testCyberDefenseSimulator = CyberDefenseSimulator()
 
 
         
@@ -59,11 +78,10 @@ class CDSFunction(unittest.TestCase):
     def testDevice(self):
         self.assertEqual(self.testDevice1.getId(), 1)
         self.assertEqual(self.testDevice1.getAddress(), "10.0.0")
+        #adding apps
         self.testDevice1.addApps(self.targetApps)
         self.assertEqual(self.testDevice1.getApps(), {1:self.testApp1, 2:self.testApp2, 3:self.testApp3})
-            #adding apps
-    # testingDevice.addApps(testApp)
-    # testingDevice.getinfo()
+
     
     def testExploit(self):
         self.assertEqual(self.testExploit.getMin(), "1.0")
@@ -71,15 +89,19 @@ class CDSFunction(unittest.TestCase):
         self.testExploit.setTargetVul(self.targetVul)
 
     def testSubnet(self):
-        self.testingSubnet.addDevices(self.deviceSamples)
-        self.testingSubnet.attack(self.testExploit, self.targetDevices)
-        self.assertEqual(self.testingSubnet.getCompromisedNum(), 3)
+        self.testSubnet.addDevices(self.deviceSamples)
+        self.testSubnet.attack(self.testExploit, self.targetDevices)
+        self.assertEqual(self.testSubnet.getCompromisedNum(), 3)
         
-#     #test cybersimulator
-#     testingCyberdenSimulator = CyberDefenseSimulator()
-#     testingCyberdenSimulator.generateDevices(10)
-#     testingCyberdenSimulator.generateVul(5)
-#     testingCyberdenSimulator.getinfo()
+    def testCDSimulator(self):
+        self.testCyberDefenseSimulator.generateDevices(10)
+        self.testCyberDefenseSimulator.generateVul(5)
+        self.testCyberDefenseSimulator.generateExploits(3)
+        self.assertEqual(self.testCyberDefenseSimulator.getSubnetSize(), 10)
+        self.assertEqual(self.testCyberDefenseSimulator.getVulneralbilitiesSize(), 5)
+        self.assertEqual(self.testCyberDefenseSimulator.getExploitsSize(), 3)
+        self.testCyberDefenseSimulator.getinfo()
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=0)
