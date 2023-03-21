@@ -25,7 +25,7 @@ import random
 class CyberDefenseSimulator:
     def __init__(self):
         # Subnet: set of devices
-        self.subnet = set()
+        self.subnet = Subnet()
         # network: set of subnet
         self.network = set()
         self.vulneralbilities = set()
@@ -34,7 +34,7 @@ class CyberDefenseSimulator:
         self.defaultApp = App(0, "game", 1.0)
 
     def getSubnetSize(self):
-        return len(self.subnet)
+        return len(self.subnet.net)
     
     def getNetworkSize(self):
         return len(self.network)
@@ -80,7 +80,7 @@ class CyberDefenseSimulator:
                     newDevice = self.generateDevice()
                 else:
                     newDevice = self.generateDevice(numOfApps)
-                self.subnet.add(newDevice)
+                self.subnet.addDevices(newDevice)
             print(f'{numOfDevice} of devices added to subnet')
         else:
             print("not a valid input for generate subnet")
@@ -112,6 +112,15 @@ class CyberDefenseSimulator:
             print(f'{numOfExploits} of Exploits added to exploits')
         else:
             print("not a valid input for generate Exploits")
+            
+    def attackSubnet(self, exploit):
+        """_summary_
+            attack the subnet with a SINGLE Exploit that has valid vulnerabilities
+        Args:
+            Exploit (Exploit): one Exploit
+        """
+        print(self.subnet.net[1].getId())
+        self.subnet.attack(exploit, exploit.target)
 
     def randomNumberGenerator(self, a, b):
         """
@@ -145,6 +154,17 @@ class CyberDefenseSimulator:
         randomNum = random.randrange(0,len(types)-1)
         return types[randomNum]
     
+    def randomSampleGenerator(self, sampleSet):
+        """_summary_
+        generates specified number of samples basd on chosen set given by the argument
+        Args:
+            set (set): specifies which set to chose (from the private var in constructor)
+        Returns:
+            type of the set: sample
+        """
+        listSet = list(sampleSet)
+        return random.choice(listSet)
+    
     def plot(self):
         """
         plot time (x-axis) vs number of compromised devices (y-axis)
@@ -164,7 +184,7 @@ class CyberDefenseSimulator:
         
     def getinfo(self):
         print("subnet : ")
-        for dev in self.subnet:
+        for dev in self.subnet.net:
             print("\t device id: " + str(dev.getId()))
         print("vulnerabilities : ")
         for vul in self.vulneralbilities:
@@ -381,13 +401,11 @@ class Vulnerability:
         if maxRange is not None:
             self.versionMax = maxRange
         
-    def setTarget(self, target):            
-        if isinstance(target, Vulnerability) or isinstance(target, App):
-            if self.Vultarget!= None:
-                print("already assigned vulnerability")
-            else:
+    def setTarget(self, target):   
+        if self.Vultarget!= None:
+            print("already assigned vulnerability")         
+        if isinstance(target, OperatingSystem) or isinstance(target, App):
                 self.Vultarget = target
-            
         else:
             print("not a valid vul target")
 
@@ -422,6 +440,8 @@ class Exploit:
     
     # assume targets is a list/set of vulnerabilities
     def setTargetVul(self, targetVul):
+        if(type(targetVul)!=list):
+            targetVul=list(targetVul)
         for vul in targetVul:
             if isinstance(vul, Vulnerability):
                 if vul.getId() in self.target.keys():
@@ -444,29 +464,29 @@ class Exploit:
 # Subnet: set of devices
 class Subnet:
     def __init__(self):
-        self.subnet = {}
+        self.net = {}
         self.numOfCompromised = 0
 
     def addDevices(self, device):
         if type(device) == list:
             for dev in device:
-                self.subnet.update({dev.getId(): dev})
+                self.net.update({dev.getId(): dev})
                 print("device "+str(dev.getId())+" added successfully")
         elif isinstance(device, Device):
-            self.subnet.update({device.getId(): device})
+            self.net.update({device.getId(): device})
             print("device "+str(device.getId())+" added successfully")
         else:
             print("not a device")
 
-    # targetDevices is a list
+    # targetDevices is a dict
     def attack(self, exploit, targetDevices):
         if isinstance(exploit, Exploit):
             # exploit.target
             print("attacking: ")
-            for target in targetDevices:
+            for devId, device in targetDevices.items():
                 # exploit.target.items():
-                if(target.getId() in self.subnet.keys()):
-                    success = self.subnet.get(target.getId()).attackDevice(exploit)
+                if(devId in self.net.keys()):
+                    success = self.net.get(devId).attackDevice(exploit)
                     if success:
                         self.numOfCompromised += 1
 
@@ -474,7 +494,7 @@ class Subnet:
             print("not an exploit, invalid parameter")
 
     def getDeviceNumber(self):
-        return self.len(self.subnet)
+        return self.len(self.net)
     
     def getCompromisedNum(self):
         return self.numOfCompromised
@@ -482,6 +502,6 @@ class Subnet:
     def getinfo(self):
         print("num of compromised: " + str(self.getCompromisedNum()))
         print("subnet devices:")
-        for deviceid, device in self.subnet.items():
+        for deviceid, device in self.net.items():
             print("\t device id: " + str(deviceid))
 
