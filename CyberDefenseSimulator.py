@@ -40,27 +40,32 @@ class CyberDefenseSimulator:
     # add to subnet
     def generateDevices(self, numOfDevice):
         if type(numOfDevice) == int:
+            currSize = self.getSubnetSize()
             for count in range(numOfDevice):
                 newDevice = Device(
-                    count, self.defaultOS, 0)
+                    currSize+count, self.defaultOS, 0)
                 self.subnet.add(newDevice)
+            print(f'{numOfDevice} of devices added to subnet')
         else:
             print("not a valid input")
 
     def generateVul(self, numOfVul):
         if type(numOfVul) == int:
+            currSize = self.getVulneralbilitiesSize()
             for count in range(numOfVul):
-                newVul = Vulnerability(count, self.defaultOS, "unknown", self.defaultApp, "1.0", "1.1")
+                newVul = Vulnerability(currSize+count, self.defaultOS, "unknown", self.defaultApp, "1.0", "1.1")
                 self.vulneralbilities.add(newVul)
+            print(f'{numOfVul} of Vulnerabilities added to vulnerabilities')
         else:
             print("not a valid input")
     
     def generateExploits(self, numOfExploits):
         if type(numOfExploits) == int:
+            currSize = self.getExploitsSize()
             for count in range(numOfExploits):
-                newExploits = Exploit(count, "unknown", "1.0", "1.1");
-                
+                newExploits = Exploit(currSize+count, "unknown", "1.0", "1.1");
                 self.exploits.add(newExploits)
+            print(f'{numOfExploits} of Exploits added to exploits')
         else:
             print("not a valid input")
 

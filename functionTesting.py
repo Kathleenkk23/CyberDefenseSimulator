@@ -1,5 +1,5 @@
 import unittest
-from CyberDefenseSimulator import * 
+from cyberDefenseSimulator import * 
 
 """
 App: Id, type, vulneralbility, version
@@ -97,9 +97,10 @@ class CDSFunction(unittest.TestCase):
         self.testCyberDefenseSimulator.generateDevices(10)
         self.testCyberDefenseSimulator.generateVul(5)
         self.testCyberDefenseSimulator.generateExploits(3)
+        self.testCyberDefenseSimulator.generateExploits(3)
         self.assertEqual(self.testCyberDefenseSimulator.getSubnetSize(), 10)
         self.assertEqual(self.testCyberDefenseSimulator.getVulneralbilitiesSize(), 5)
-        self.assertEqual(self.testCyberDefenseSimulator.getExploitsSize(), 3)
+        self.assertEqual(self.testCyberDefenseSimulator.getExploitsSize(), 6)
         self.testCyberDefenseSimulator.getinfo()
 
 
