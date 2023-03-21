@@ -1,4 +1,12 @@
 import copy
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import math
+import time
+import datetime
+import random
+
 # class CyberDefenseSimulator:
 
 # App: Id, type, vulneralbility, version
@@ -22,8 +30,8 @@ class CyberDefenseSimulator:
         self.network = set()
         self.vulneralbilities = set()
         self.exploits = set()
-        self.defaultOS = OperatingSystem(1, "OS", "1.0")
-        self.defaultApp = App(1, "email", "1.0")
+        self.defaultOS = OperatingSystem(0, "OS", 1.0)
+        self.defaultApp = App(0, "game", 1.0)
 
     def getSubnetSize(self):
         return len(self.subnet)
@@ -37,24 +45,57 @@ class CyberDefenseSimulator:
     def getExploitsSize(self):
         return len(self.exploits)
     
-    # add to subnet
-    def generateDevices(self, numOfDevice):
+    def generateApps(self, numOfApps):
+        """_summary_
+        generates a list of apps with the specified number of apps to be added to the device.
+        hence returns a list of apps.
+        Args:
+            numOfApps (int): number of apps to be generated
+        """
+        app_list = []
+        if type(numOfApps) == int:
+            for count in range(numOfApps):
+                random_app = App(count, self.AppTypeGenerator(), self.randomNumberGenerator(1.0,3.0))
+                app_list.append(random_app)
+        return app_list
+            
+    def generateDevice(self, numOfApps=3):
+        if type(numOfApps) == int:
+            AppsList = self.generateApps(numOfApps)
+            currSize = self.getSubnetSize()
+            newDevice = Device(currSize, self.defaultOS, 0)
+            newDevice.addApps(AppsList)
+            # newDevice.getinfo()
+            print(f'{len(AppsList)} of apps added to device')
+            return newDevice
+        else:
+            print("not a valid input for generate Device")
+    
+    # add devices to subnet
+    def generateSubnet(self, numOfDevice, numOfApps=None):
         if type(numOfDevice) == int:
             currSize = self.getSubnetSize()
             for count in range(numOfDevice):
-                newDevice = Device(
-                    currSize+count, self.defaultOS, 0)
+                if numOfApps is None:
+                    newDevice = self.generateDevice()
+                else:
+                    newDevice = self.generateDevice(numOfApps)
                 self.subnet.add(newDevice)
             print(f'{numOfDevice} of devices added to subnet')
         else:
-            print("not a valid input")
+            print("not a valid input for generate subnet")
+            
+    #  def generateNetwork
 
     def generateVul(self, numOfVul):
         if type(numOfVul) == int:
             currSize = self.getVulneralbilitiesSize()
             for count in range(numOfVul):
-                newVul = Vulnerability(currSize+count, self.defaultOS, "unknown", self.defaultApp, "1.0", "1.1")
+                minR, maxR = self.randomRangeGenerator(1.0, 1.3)
+                vulType = self.VulTypeGenerator()
+                newVul = Vulnerability(currSize+count, self.defaultOS, vulType, self.defaultApp, minR, maxR)
                 self.vulneralbilities.add(newVul)
+                # newVul.getInfo()
             print(f'{numOfVul} of Vulnerabilities added to vulnerabilities')
         else:
             print("not a valid input")
@@ -63,16 +104,68 @@ class CyberDefenseSimulator:
         if type(numOfExploits) == int:
             currSize = self.getExploitsSize()
             for count in range(numOfExploits):
-                newExploits = Exploit(currSize+count, "unknown", "1.0", "1.1");
+                minR, maxR = self.randomRangeGenerator(1.0,1.5)
+                ExpType = self.ExpTypeGenerator()
+                newExploits = Exploit(int(currSize+count), ExpType, minR, maxR)
                 self.exploits.add(newExploits)
+                # newExploits.getInfo()
             print(f'{numOfExploits} of Exploits added to exploits')
         else:
-            print("not a valid input")
+            print("not a valid input for generate Exploits")
 
+    def randomNumberGenerator(self, a, b):
+        """
+        generates 1 decimal point random number in range a to b
+        Args:
+            a (int): lower bound
+            b (int): higher bound
+        """
+        randomNum = random.randint(a*10,b*10)/10
+        return randomNum
+    
+    def randomRangeGenerator(self, a=1.0, b=1.0):
+        num1 = self.randomNumberGenerator(a,b)
+        num2 = self.randomNumberGenerator(a,b)
+        maxR = max(num1, num2)
+        minR = min(num1, num2)
+        return minR, maxR
+        
+    def AppTypeGenerator(self):
+        types = ["game", "lifestype", "social", "entertainment", "productivity"]
+        randomNum = random.randrange(0,len(types)-1)
+        return types[randomNum]
+    
+    def VulTypeGenerator(self):
+        types = ["unknown","misconfigurations", "outdated software", "unauthorized access", "weak user credentials", "Unsecured APIs"]
+        randomNum = random.randrange(0,len(types)-1)
+        return types[randomNum]
+    
+    def ExpTypeGenerator(self):
+        types = ["unknown", "known"]
+        randomNum = random.randrange(0,len(types)-1)
+        return types[randomNum]
+    
+    def plot(self):
+        """
+        plot time (x-axis) vs number of compromised devices (y-axis)
+        """
+        plt.title("Number of Compromised Devices with respect to Time")
+        dataframe = pd.DataFrame({'date_of_week': np.array([datetime.datetime(2021, 11, i+1)
+                                                    for i in range(7)]),
+                          'classes': [5, 6, 8, 2, 3, 7, 4]})
+ 
+        # To draw scatter time series plot of the given dataframe
+        plt.plot_date(dataframe.date_of_week, dataframe.classes)
+        
+        plt.xticks(rotation=30, ha='right')
+        plt.xlabel("time")
+        plt.ylabel("number of compromised device")
+        plt.show()
+        
     def getinfo(self):
         print("subnet : ")
-        for device in self.subnet:
-            print("\t device id: " + str(device.getId()))
+        for dev in self.subnet:
+            print("\t device id: " + str(dev.getId()))
         print("vulnerabilities : ")
         for vul in self.vulneralbilities:
             print("\t vulnerability id: " + str(vul.getId()))
@@ -175,9 +268,9 @@ class App:
 
     def getinfo(self):
         stringId = str(self.getId())
-        print("app id: " + stringId)
+        print("\napp id: " + stringId)
         print("app type: " + self.getType())
-        print("app version: " + self.getVersion())
+        print("app version: " + str(self.getVersion()))
         print("app vulneralbiblity: ")
         for vulId, vul in self.vulnerabilities.items():
             print("\tvul id: " + str(vul.getId()))
@@ -253,24 +346,24 @@ class Device:
     def getinfo(self):
         stringId = str(self.getId())
         print("device id: " + stringId)
-        print("device address: " + self.getAddress())
+        print("device address: " + str(self.getAddress()))
         print("device OS type: " + self.OS.type)
-        print("device OS version: " + self.OS.version)
+        print("device OS version: " + str(self.OS.version))
         print("device apps: ")
         for appID, app in self.apps.items():
             print("\t app id: " + str(app.getId()))
 
 
 class Vulnerability:
-    def __init__(self, id, os, vulType, target, minR, maxR):
+    def __init__(self, id, os, vulType, target, minR=None, maxR=None):
         self.id = id
         self.OS = os
         # vul <-> one app, or one os (target 1 thing), but a seq of version
         self.Vultarget = None
         self.setTarget(target)
         self.type = vulType  # known, unknwon
-        self.versionMin = None
-        self.versionMax = None
+        self.versionMin = 1.0
+        self.versionMax = 1.0
         self.setRange(minR, maxR)
 
     def getId(self):
@@ -299,17 +392,17 @@ class Vulnerability:
             print("not a valid vul target")
 
     def getInfo(self):
-        print(f'type is {self.type}')
+        print(f'type is {str(self.type)}')
         print(f'range is min: {self.versionMin} and max: {self.versionMax}')
 
 
 class Exploit:
-    def __init__(self, id, expType, minR, maxR):
+    def __init__(self, id, expType, minR=None, maxR=None):
         self.id = id
         self.target = {}  # dict of target devices
         self.type = expType  # known and unknown
-        self.versionMin = None
-        self.versionMax = None
+        self.versionMin = 1.0
+        self.versionMax = 1.0
         self.setRange(minR, maxR)
 
     def getId(self):
@@ -381,7 +474,7 @@ class Subnet:
             print("not an exploit, invalid parameter")
 
     def getDeviceNumber(self):
-        return self.len(subnet)
+        return self.len(self.subnet)
     
     def getCompromisedNum(self):
         return self.numOfCompromised
@@ -392,6 +485,3 @@ class Subnet:
         for deviceid, device in self.subnet.items():
             print("\t device id: " + str(deviceid))
 
-
-# network: set of subnet
-network = {}
