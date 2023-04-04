@@ -1,7 +1,7 @@
 import copy
 import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
+# import pandas as pd
+# import numpy as np
 import math
 import time
 import datetime
@@ -10,13 +10,12 @@ import random
 # class CyberDefenseSimulator:
 
 # App: Id, type, vulneralbility, version
-# OS: ID, type, version, vulnerabilities
-# Device: OS, {app}, address
+# OS: Id, type, vulnerabilities, version
+# Device: Id, OS, {app}, address, isCompromised
 # Subnet: set of devices
 # network: set of subnet
-# explicit: vulnerability, OS, app
+# exploit: vulnerability, OS, app
 # workflow: source, test, size(# of steps)
-# OS: Id, type, version, vulnerabilities
 # Vulnerability
 
 # class CyberDefenseSimulator
@@ -26,12 +25,14 @@ class CyberDefenseSimulator:
     def __init__(self):
         # Subnet: set of devices
         self.subnet = Subnet()
+        self.apps = set()
         # network: set of subnet
         self.network = set()
         self.vulneralbilities = set()
         self.exploits = set()
         self.defaultOS = OperatingSystem(0, "OS", 1.0)
         self.defaultApp = App(0, "game", 1.0)
+        self.defaulVul = Vulnerability(0, "unknown", self.defaultApp)
 
     def getSubnetSize(self):
         return len(self.subnet.net)
@@ -45,7 +46,7 @@ class CyberDefenseSimulator:
     def getExploitsSize(self):
         return len(self.exploits)
     
-    def generateApps(self, numOfApps):
+    def generateApps(self, numOfApps, addVul=False, numOfVul = 1):
         """_summary_
         generates a list of apps with the specified number of apps to be added to the device.
         hence returns a list of apps.
@@ -56,30 +57,37 @@ class CyberDefenseSimulator:
         if type(numOfApps) == int:
             for count in range(numOfApps):
                 random_app = App(count, self.AppTypeGenerator(), self.randomNumberGenerator(1.0,3.0))
+                if addVul:
+                    if(len(self.vulneralbilities)>=numOfVul):
+                        for i in range(numOfVul):
+                            random_app.addVulnerability(self.randomSampleGenerator(self.vulneralbilities))
+                    else:
+                        random_app.addVulnerability(self.defaulVul)
                 app_list.append(random_app)
+                self.apps.add(random_app)
         return app_list
             
-    def generateDevice(self, numOfApps=3):
+    def generateDevice(self, numOfApps=3, minVulperApp=0, maxVulperApp=0):
         if type(numOfApps) == int:
-            AppsList = self.generateApps(numOfApps)
+            AppsList = self.generateApps(numOfApps, True, int(self.randomNumberGenerator(minVulperApp,maxVulperApp)))
             currSize = self.getSubnetSize()
             newDevice = Device(currSize, self.defaultOS, 0)
             newDevice.addApps(AppsList)
             # newDevice.getinfo()
-            print(f'{len(AppsList)} of apps added to device')
+            # print(f'{len(AppsList)} number of apps added to device with id {newDevice.getId()}')
             return newDevice
         else:
             print("not a valid input for generate Device")
     
     # add devices to subnet
-    def generateSubnet(self, numOfDevice, numOfApps=None):
+    def generateSubnet(self, numOfDevice, addApps=None, minVulperApp=0, maxVulperApp=0):
         if type(numOfDevice) == int:
             currSize = self.getSubnetSize()
             for count in range(numOfDevice):
-                if numOfApps is None:
+                if addApps is None:
                     newDevice = self.generateDevice()
                 else:
-                    newDevice = self.generateDevice(numOfApps)
+                    newDevice = self.generateDevice(addApps, minVulperApp, maxVulperApp)
                 self.subnet.addDevices(newDevice)
             print(f'{numOfDevice} of devices added to subnet')
         else:
@@ -93,20 +101,38 @@ class CyberDefenseSimulator:
             for count in range(numOfVul):
                 minR, maxR = self.randomRangeGenerator(1.0, 1.3)
                 vulType = self.VulTypeGenerator()
-                newVul = Vulnerability(currSize+count, self.defaultOS, vulType, self.defaultApp, minR, maxR)
+                # initially given dummy app
+                newVul = Vulnerability(currSize+count, vulType, self.defaultApp, minR, maxR)
                 self.vulneralbilities.add(newVul)
                 # newVul.getInfo()
             print(f'{numOfVul} of Vulnerabilities added to vulnerabilities')
         else:
             print("not a valid input")
+            
+    def changeVulTarget(self):
+        """
+        after vul generated and app generated, we want to reset the vul target from dummy to a randomized app
+        """
+        if len(self.apps) ==0:
+            print("not enough apps")
+        if len(self.apps) <len(self.vulneralbilities):
+            print("apps less than vul")
+        for vul in self.vulneralbilities:
+            vul.setTarget(self.randomSampleGenerator(self.appss))
     
-    def generateExploits(self, numOfExploits):
+    def generateExploits(self, numOfExploits, addVul=False, minVulperApp=0, maxVulperExp=0):
         if type(numOfExploits) == int:
             currSize = self.getExploitsSize()
             for count in range(numOfExploits):
                 minR, maxR = self.randomRangeGenerator(1.0,1.5)
                 ExpType = self.ExpTypeGenerator()
                 newExploits = Exploit(int(currSize+count), ExpType, minR, maxR)
+                if addVul:
+                    if(len(self.vulneralbilities)>=maxVulperExp):
+                        for i in range(int(self.randomNumberGenerator(minVulperApp, maxVulperExp))):
+                            newExploits.setTargetVul(self.randomSampleGenerator(self.vulneralbilities))
+                    else:
+                        newExploits.addVulnerability(self.defaulVul)
                 self.exploits.add(newExploits)
                 # newExploits.getInfo()
             print(f'{numOfExploits} of Exploits added to exploits')
@@ -119,8 +145,8 @@ class CyberDefenseSimulator:
         Args:
             Exploit (Exploit): one Exploit
         """
-        print(self.subnet.net[1].getId())
-        self.subnet.attack(exploit, exploit.target)
+        print(f'expected target is vulneralbility with id:{exploit.target.keys()}')
+        self.subnet.attack(exploit, self.subnet.net)
 
     def randomNumberGenerator(self, a, b):
         """
@@ -129,6 +155,8 @@ class CyberDefenseSimulator:
             a (int): lower bound
             b (int): higher bound
         """
+        if(a==b):
+            return a
         randomNum = random.randint(a*10,b*10)/10
         return randomNum
     
@@ -156,9 +184,9 @@ class CyberDefenseSimulator:
     
     def randomSampleGenerator(self, sampleSet):
         """_summary_
-        generates specified number of samples basd on chosen set given by the argument
+        generates 1 sample basd on chosen set given by the argument
         Args:
-            set (set): specifies which set to chose (from the private var in constructor)
+            sampleSet (set): specifies which set to chose (from the private var in constructor)
         Returns:
             type of the set: sample
         """
@@ -184,7 +212,7 @@ class CyberDefenseSimulator:
         
     def getinfo(self):
         print("subnet : ")
-        for dev in self.subnet.net:
+        for devId, dev in self.subnet.net.items():
             print("\t device id: " + str(dev.getId()))
         print("vulnerabilities : ")
         for vul in self.vulneralbilities:
@@ -200,7 +228,7 @@ class CyberDefenseSimulator:
 class OperatingSystem:
     def __init__(self, id, type, version):
         self.id = id
-        self.type = type
+        self.type = type #"known", "unknown"
         self.version = version
         self.vulnerabilities = {}
 
@@ -219,7 +247,7 @@ class OperatingSystem:
                 print("already contain the Vulnerability")
             else:
                 self.vulnerabilities.update({vul.getId(): vul})
-                print("Vulnerability "+str(vul.getId())+" added successfully")
+                # print("Vulnerability "+str(vul.getId())+" added successfully")
         else:
             print("not a Vulnerability")
 
@@ -266,7 +294,7 @@ class App:
                 print("already contain the Vulnerability")
             else:
                 self.vulnerabilities.update({vul.getId(): vul})
-                print("Vulnerability "+str(vul.getId())+" added successfully")
+                # print("Vulnerability "+str(vul.getId())+" added successfully")
         else:
             print("not a Vulnerability")
 
@@ -296,7 +324,7 @@ class App:
             print("\tvul id: " + str(vul.getId()))
 
 
-# Device: OS, {app}, address
+# Device: OS, {app}, address, isCompromised
 class Device:
     def __init__(self, id, OS, address):
         self.id = id
@@ -317,7 +345,7 @@ class Device:
     def addSingleApp(self, appName):
         if isinstance(appName, App):
             self.apps[appName.getId()] = appName
-            print("app "+str(appName.getId())+" added successfully")
+            # print("app "+str(appName.getId())+" added successfully")
         else:
             print("not an app")
     
@@ -342,11 +370,33 @@ class Device:
     def getIsCompromised(self):
         return self.isCompromised
 
-    def attackSingleDevice(self):
-        if(self.getIsCompromised() == False):
-            print(f'Device {self.getId()} attacked successful')
-            self.isCompromised = True
-            return True
+
+    def attackSingleDevice(self, exploitTargetVul):
+        """_summary_
+
+        Args:
+            exploitTargetVul (dictionary): passes the diction of the exploit's target vulnerability
+
+        Returns:
+            boolean: true of false depends on whether if the attack was successful
+        """
+        for vulId, vul in exploitTargetVul.items():
+            for appId, app in self.apps.items():
+                if(vul in app.vulnerabilities.values()):
+                    self.isCompromised = True
+                    # print("app attacked!!!!!!!!!!!!!")
+                    # print(f'Device {self.getId()} attacked successful')
+                    return True
+                
+                if vul in self.OS.vulnerabilities.values():
+                    self.isCompromised = True
+                    print("OS attacked!!!!!!!!!!!!!")
+                    print(f'Device {self.getId()} attacked successful')
+                    return True
+                
+            
+        # print(f'Device {self.getId()} not attacked ')
+        return False
 
     def attackDevice(self, exploit):
         if isinstance(exploit, Exploit)!=True:
@@ -355,10 +405,10 @@ class Device:
         # check if device vulnerable to exploit
         if self.getIsCompromised():
             # if not vulnerable, return false
-            return True
+            return False
             # if vulnerable:
         else:
-            return self.attackSingleDevice()
+            return self.attackSingleDevice(exploit.target)
 
     def resetIsCompromise(self):
         self.isCompromised = False
@@ -375,9 +425,8 @@ class Device:
 
 
 class Vulnerability:
-    def __init__(self, id, os, vulType, target, minR=None, maxR=None):
+    def __init__(self, id, vulType, target, minR=None, maxR=None):
         self.id = id
-        self.OS = os
         # vul <-> one app, or one os (target 1 thing), but a seq of version
         self.Vultarget = None
         self.setTarget(target)
@@ -417,7 +466,7 @@ class Vulnerability:
 class Exploit:
     def __init__(self, id, expType, minR=None, maxR=None):
         self.id = id
-        self.target = {}  # dict of target devices
+        self.target = {}  # dict of target vulnerability
         self.type = expType  # known and unknown
         self.versionMin = 1.0
         self.versionMax = 1.0
@@ -438,18 +487,20 @@ class Exploit:
         if maxRange is not None:
             self.versionMax = maxRange
     
-    # assume targets is a list/set of vulnerabilities
+    # assume targets is a single vul, list/set of vulnerabilities
     def setTargetVul(self, targetVul):
         if(type(targetVul)!=list):
-            targetVul=list(targetVul)
+            if(isinstance(targetVul, Vulnerability)):
+                targetVul=[targetVul]
+            else:
+                targetVul=list(targetVul)
         for vul in targetVul:
             if isinstance(vul, Vulnerability):
                 if vul.getId() in self.target.keys():
                     continue
                 else:
                     self.target.update({vul.getId(): vul})
-                    print("target vul "+str(vul.getId()) +
-                          " added successfully")
+                    # print("target vul "+str(vul.getId()) +" added successfully")
             else:
                 print("not a valid vul target")
 
@@ -467,19 +518,29 @@ class Subnet:
         self.net = {}
         self.numOfCompromised = 0
 
+
+    def convert(self, lst):
+        res_dct = {lst[i].getId(): lst[i] for i in range(0, len(lst))}
+        # print(res_dct)
+        return res_dct
+         
+
     def addDevices(self, device):
         if type(device) == list:
             for dev in device:
                 self.net.update({dev.getId(): dev})
-                print("device "+str(dev.getId())+" added successfully")
+                # print("device "+str(dev.getId())+" added successfully")
         elif isinstance(device, Device):
             self.net.update({device.getId(): device})
-            print("device "+str(device.getId())+" added successfully")
+            # print("device "+str(device.getId())+" added successfully")
         else:
             print("not a device")
 
     # targetDevices is a dict
     def attack(self, exploit, targetDevices):
+        
+        if type(targetDevices) != dict:
+            print("target Device is not a dict")
         if isinstance(exploit, Exploit):
             # exploit.target
             print("attacking: ")

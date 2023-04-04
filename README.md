@@ -58,4 +58,7 @@ notes feb 21:
 
 
 notes march 21:
-- attacker (new)
+- attacker (new, don't implement yet)
+
+- exploit on a device (with a target set of vul), exploit attack by checking device has the vulnerability(implemented)
+- plot time tick which generates a series of device

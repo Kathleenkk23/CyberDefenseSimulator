@@ -22,20 +22,27 @@ class testSimulator(unittest.TestCase):
         self.assertEqual(type(list(self.simulator.exploits)[0].getMin()), float)
         self.assertEqual(type(list(self.simulator.exploits)[0].type), str)
         
-        self.simulator.generateDevice(3)
-        self.simulator.generateSubnet(200,4)
-        self.simulator.generateVul(5)
-        self.targetVuls = [self.simulator.randomSampleGenerator(self.simulator.vulneralbilities)]
-        
-        self.targetApps = self.simulator.generateApps(30)
+        self.targetApps = self.simulator.generateApps(30, True)
         self.assertEqual(len(list(self.targetApps)), 30)
         self.assertEqual(type(list(self.targetApps)[0].type), str)
+        
+        # self.simulator.generateDevice(3)
+        maxVulperApp = 2
+        numOfApps = 10
+        numOfDevice = 200
+        self.simulator.generateVul(20)
+        self.simulator.generateSubnet(numOfDevice, numOfApps, maxVulperApp)
+       
+        self.targetVuls = [self.simulator.randomSampleGenerator(self.simulator.vulneralbilities)]
+        
+
         
         # generate exploit, pick one exploit, check the compromised device
         self.ranExploit = self.simulator.randomSampleGenerator(self.simulator.exploits)
         self.assertEqual(type(self.ranExploit), Exploit)
         self.ranExploit.setTargetVul(self.targetVuls)
         self.simulator.attackSubnet(self.ranExploit)
+        
         print(f'number of compromised: {self.simulator.subnet.getCompromisedNum()}')
         
         
