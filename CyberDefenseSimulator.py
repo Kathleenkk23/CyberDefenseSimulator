@@ -58,18 +58,22 @@ class CyberDefenseSimulator:
             for count in range(numOfApps):
                 random_app = App(count, self.AppTypeGenerator(), self.randomNumberGenerator(1.0,3.0))
                 if addVul:
-                    if(len(self.vulneralbilities)>=numOfVul):
-                        for i in range(numOfVul):
-                            random_app.addVulnerability(self.randomSampleGenerator(self.vulneralbilities))
-                    else:
-                        random_app.addVulnerability(self.defaulVul)
+                    appVul = self.generateVul(numOfVul, random_app)
+                    # if(len(self.vulneralbilities)>=numOfVul):
+                    #     for i in range(numOfVul):
+                    #         random_app.addVulnerability(self.randomSampleGenerator(self.vulneralbilities))
+                    # else:
+                    #     random_app.addVulnerability(self.defaulVul)
                 app_list.append(random_app)
                 self.apps.add(random_app)
         return app_list
             
     def generateDevice(self, numOfApps=3, minVulperApp=0, maxVulperApp=0):
         if type(numOfApps) == int:
-            AppsList = self.generateApps(numOfApps, True, int(self.randomNumberGenerator(minVulperApp,maxVulperApp)))
+            AppsList = []
+            # self.generateApps(numOfApps, True, int(self.randomNumberGenerator(minVulperApp,maxVulperApp)))
+            for i in range(minVulperApp, maxVulperApp):
+                AppsList.append(self.randomSampleGenerator(self.apps))
             currSize = self.getSubnetSize()
             newDevice = Device(currSize, self.defaultOS, 0)
             newDevice.addApps(AppsList)
@@ -95,17 +99,32 @@ class CyberDefenseSimulator:
             
     #  def generateNetwork
 
-    def generateVul(self, numOfVul):
+    def generateVul(self, numOfVul, targetApp=None, targetOS=None):
+        """either target App is given or target OS is given, cannot be both
+            numOfVul specifies the number of vul given to the target OS or App
+        Args:
+            numOfVul (_type_): _description_
+            targetApp (_type_, optional): _description_. Defaults to None.
+            targetOS (_type_, optional): _description_. Defaults to None.
+        """
         if type(numOfVul) == int:
             currSize = self.getVulneralbilitiesSize()
             for count in range(numOfVul):
                 minR, maxR = self.randomRangeGenerator(1.0, 1.3)
                 vulType = self.VulTypeGenerator()
                 # initially given dummy app
-                newVul = Vulnerability(currSize+count, vulType, self.defaultApp, minR, maxR)
+                target = self.defaultApp
+                if targetApp!=None:
+                    target = targetApp
+                elif targetOS!=None:
+                    target = targetOS
+                newVul = Vulnerability(currSize+count, vulType, target, minR, maxR)
                 self.vulneralbilities.add(newVul)
+                if targetApp!=None or targetOS!=None:
+                    target.addVulnerability(newVul)
+                    # print("Vulnerability added to target app/os")
                 # newVul.getInfo()
-            print(f'{numOfVul} of Vulnerabilities added to vulnerabilities')
+            # print(f'{numOfVul} of Vulnerabilities added to vulnerabilities')
         else:
             print("not a valid input")
             
@@ -128,11 +147,11 @@ class CyberDefenseSimulator:
                 ExpType = self.ExpTypeGenerator()
                 newExploits = Exploit(int(currSize+count), ExpType, minR, maxR)
                 if addVul:
-                    if(len(self.vulneralbilities)>=maxVulperExp):
-                        for i in range(int(self.randomNumberGenerator(minVulperApp, maxVulperExp))):
-                            newExploits.setTargetVul(self.randomSampleGenerator(self.vulneralbilities))
-                    else:
-                        newExploits.addVulnerability(self.defaulVul)
+                    #  if(len(self.vulneralbilities)>=maxVulperExp):
+                    for i in range(int(self.randomNumberGenerator(minVulperApp, maxVulperExp))):
+                        newExploits.setTargetVul(self.randomSampleGenerator(self.vulneralbilities))
+                    # else:
+                    #     newExploits.addVulnerability(self.defaulVul)
                 self.exploits.add(newExploits)
                 # newExploits.getInfo()
             print(f'{numOfExploits} of Exploits added to exploits')
@@ -509,7 +528,7 @@ class Exploit:
         print(f'range is min: {self.versionMin} and max: {self.versionMax}')
         print("targeted apps: ")
         for targetID, targetApp in self.target.items():
-            print("\t target id: " + str(targetApp.getId()))
+            print("\t target id: " + str(targetApp.getId())+" vul")
 
 
 # Subnet: set of devices

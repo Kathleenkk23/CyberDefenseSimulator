@@ -20,20 +20,24 @@ class CDSimulator():
 
 if __name__ == "__main__":
     simulator = CyberDefenseSimulator()
-    maxVulperExp=3
-    simulator.generateVul(20)
-    # generate exploit, pick one exploit, check the compromised device
-    simulator.generateExploits(20, True, maxVulperExp, maxVulperExp)
     
-   
-    targetApps = simulator.generateApps(30, True)
+    targetApps = simulator.generateApps(30, True, 2)
+    print(simulator.getVulneralbilitiesSize())
+    
+    # simulator.generateVul(20)
+    # generate exploit, pick one exploit, check the compromised device
+    minVulperExp=1
+    maxVulperExp=3
+    simulator.generateExploits(20, True, minVulperExp, maxVulperExp)
+    
     # simulator.generateDevice(3)
     maxVulperApp = 20
     addApps = 6
-    numOfDevice = 1000
+    numOfDevice = 100
     
-
+    print(f'exploit size is {simulator.getExploitsSize()}')
     ranExploit = simulator.randomSampleGenerator(simulator.exploits)
+    print (ranExploit.getInfo())
     numOfCompromised1 = []
     # test how num of max Vul per App affect the num of compromised
     for i in range(1, maxVulperApp+1):
@@ -41,7 +45,7 @@ if __name__ == "__main__":
         
         simulator.attackSubnet(ranExploit)
         numOfCompromised1.append(simulator.subnet.getCompromisedNum())
-        print(f'1) number of compromised: {simulator.subnet.getCompromisedNum()}')
+        # print(f'1) number of compromised: {simulator.subnet.getCompromisedNum()}')
         simulator.subnet.numOfCompromised=0
     
     fig, axs = plt.subplots(2)
@@ -63,7 +67,7 @@ if __name__ == "__main__":
         simulator.generateSubnet(numOfDevice, i, maxVulperApp, maxVulperApp)
         simulator.attackSubnet(ranExploit)
         numOfCompromised2.append(simulator.subnet.getCompromisedNum())
-        print(f'2) number of compromised: {simulator.subnet.getCompromisedNum()}')
+        # print(f'2) number of compromised: {simulator.subnet.getCompromisedNum()}')
         simulator.subnet.numOfCompromised=0
 
     axs[1].set_title("Max num App per device and Number of Compromised Device")
