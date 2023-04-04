@@ -34,6 +34,12 @@ class CyberDefenseSimulator:
         self.defaultApp = App(0, "game", 1.0)
         self.defaulVul = Vulnerability(0, "unknown", self.defaultApp)
 
+    def resetSubnet(self):
+        # num = input("1 to comfirm: ")
+        num=1
+        if num == 1:
+            self.subnet.net.clear()
+        
     def getSubnetSize(self):
         return len(self.subnet.net)
     
@@ -93,7 +99,7 @@ class CyberDefenseSimulator:
                 else:
                     newDevice = self.generateDevice(addApps, minVulperApp, maxVulperApp)
                 self.subnet.addDevices(newDevice)
-            print(f'{numOfDevice} of devices added to subnet')
+            # print(f'{numOfDevice} of devices added to subnet')
         else:
             print("not a valid input for generate subnet")
             
@@ -578,6 +584,11 @@ class Subnet:
     
     def getCompromisedNum(self):
         return self.numOfCompromised
+    
+    def resetCompromisedinSubnet(self):
+        for deviceId, device in self.net.items():
+            device.resetIsCompromise()
+        self.numOfCompromised=0
 
     def getinfo(self):
         print("num of compromised: " + str(self.getCompromisedNum()))
