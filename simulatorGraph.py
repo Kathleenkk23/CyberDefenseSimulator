@@ -22,39 +22,60 @@ if __name__ == "__main__":
     simulator = CyberDefenseSimulator()
     maxVulperExp=3
     simulator.generateVul(20)
-    targetVuls = [simulator.randomSampleGenerator(simulator.vulneralbilities)]
     # generate exploit, pick one exploit, check the compromised device
     simulator.generateExploits(20, True, maxVulperExp, maxVulperExp)
-    ranExploit = simulator.randomSampleGenerator(simulator.exploits)
-    ranExploit.setTargetVul(targetVuls)
     
    
     targetApps = simulator.generateApps(30, True)
     # simulator.generateDevice(3)
     maxVulperApp = 20
-    addApps = 5
+    addApps = 6
     numOfDevice = 1000
     
 
-        
-    numOfCompromised = []
-    for i in range(1,maxVulperApp+1):
-        simulator.subnet.numOfCompromised=0
-        simulator.generateSubnet(numOfDevice, addApps, i, i)
+    ranExploit = simulator.randomSampleGenerator(simulator.exploits)
+    numOfCompromised1 = []
+    # test how num of max Vul per App affect the num of compromised
+    for i in range(1, maxVulperApp+1):
+        simulator.generateSubnet(numOfDevice, addApps, 0, i)
         
         simulator.attackSubnet(ranExploit)
-        numOfCompromised.append(simulator.subnet.getCompromisedNum())
-        print(f'number of compromised: {simulator.subnet.getCompromisedNum()}')
+        numOfCompromised1.append(simulator.subnet.getCompromisedNum())
+        print(f'1) number of compromised: {simulator.subnet.getCompromisedNum()}')
+        simulator.subnet.numOfCompromised=0
     
     fig, axs = plt.subplots(2)
     fig.suptitle('Cyber Security Simulator')
     
     axs[0].set_title("Max Vulnerabilities per App and Number of Compromised Device")
     axs[0].set(xlabel="# of Compromised Device", ylabel="# Max Vul per App")
-    axs[0].plot(range(1,maxVulperApp+1), numOfCompromised)
+    axs[0].plot(range(1,maxVulperApp+1), numOfCompromised1)
     axs[0].set_xticks(np.arange(min(range(maxVulperApp)), max(range(maxVulperApp))+1, 1.0))
     axs[0].set_xlim(0, maxVulperApp)
     fig.subplots_adjust(hspace=0.5)
+    
+    
+    # test how num of apps per device affect the num of compromised
+    simulator.subnet.numOfCompromised=0
+    ranExploit = simulator.randomSampleGenerator(simulator.exploits)
+    numOfCompromised2 = []
+    for i in range(1, addApps+1):
+        simulator.generateSubnet(numOfDevice, i, maxVulperApp, maxVulperApp)
+        simulator.attackSubnet(ranExploit)
+        numOfCompromised2.append(simulator.subnet.getCompromisedNum())
+        print(f'2) number of compromised: {simulator.subnet.getCompromisedNum()}')
+        simulator.subnet.numOfCompromised=0
+
+    axs[1].set_title("Max num App per device and Number of Compromised Device")
+    axs[1].set(xlabel="# Max Num App per Device", ylabel="# of Compromised Device")
+    axs[1].plot(range(1,addApps+1), numOfCompromised2)
+    axs[1].set_xticks(np.arange(min(range(addApps)), max(range(addApps))+1, 1.0))
+    axs[1].set_xlim(0, addApps)
+    
+    
+    
+    
+    
     plt.show()
     
     
