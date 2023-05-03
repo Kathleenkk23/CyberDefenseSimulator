@@ -61,4 +61,21 @@ notes march 21:
 - attacker (new, don't implement yet)
 
 - exploit on a device (with a target set of vul), exploit attack by checking device has the vulnerability(implemented)
-- plot time tick which generates a series of device
+- plot time tick which generates a series of device(need to fix)
+
+
+note apr 4:
+- reset: pick random exploit and attack, then reset some devices from the net (implemented)
+- implement attack method in subnet with arguement of devices(set of devices), 2 attack method
+- 10 to 20 time steps 
+- plot time vs num of compromised
+
+ source MY_ENV/bin/activate
+
+next step:
+- start populating input data sheet (say, CVE and NVD (google this))
+    - gives vul, but prob not exploit(manually generate exploit with med to high severity)
+    - need to pre populate the data: OS, apps, etc
+- severity(implement both->): 1) prob of successful attack given the severity  
+            2) use severity to generate exploit (probabilistic? with respect to the vulnerability's severity)
+
