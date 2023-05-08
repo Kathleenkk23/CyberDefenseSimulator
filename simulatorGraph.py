@@ -36,7 +36,7 @@ if __name__ == "__main__":
    
     # test how num of compromised change with time
     numOfCompromisedDev = []
-    numOfIteration = 50
+    numOfIteration = int(input("num of iterations (suggested 50): "))
     resetNum = 300
     resetStep = 5 #number of step before resetting some devices
     maxVulperApp = 4
@@ -63,12 +63,15 @@ if __name__ == "__main__":
     axs[0].plot(range(numOfIteration), numOfCompromisedDev)
     axs[0].set_xticks(np.arange(min(range(numOfIteration)), max(range(numOfIteration))+1, 2.0))
     axs[0].set_xlim(0, numOfIteration)
-    fig.subplots_adjust(hspace=0.5)
+    fig.subplots_adjust(hspace=1)
     
     
     
     # test how num of max Vul per App affect the num of compromised
     # simulator.generateDevice(3)
+    maxVulperApp = 10
+    addApps = 20
+    ranExploit = simulator.randomSampleGenerator(simulator.exploits)
     simulator.subnet.resetAllCompromisedSubnet()
   
     for i in range(1, maxVulperApp+1):
@@ -81,10 +84,10 @@ if __name__ == "__main__":
     
     axs[1].set_title("Max Vulnerabilities per App and Number of Compromised Device")
     axs[1].set(ylabel="# of Compromised Device", xlabel="# Max Vul per App")
-    axs[1].plot(range(1,maxVulperApp+1), numOfCompromised1)
+    axs[1].plot(range(maxVulperApp), numOfCompromised1)
     axs[1].set_xticks(np.arange(min(range(maxVulperApp)), max(range(maxVulperApp))+1, 1.0))
-    axs[1].set_xlim(0, maxVulperApp)
-    fig.subplots_adjust(hspace=0.5)
+    axs[1].set_xlim(1, maxVulperApp+1)
+    fig.subplots_adjust(hspace=1)
     
     
     # test how num of apps per device affect the num of compromised
