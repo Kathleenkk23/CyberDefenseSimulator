@@ -5,15 +5,15 @@ A development for a cybersecurity simulation environment that is well suited for
 
 Basic Structure of the Simulator
 
-# App: Id, type, vulneralbility, version
-# OS: ID, type, version, vulnerabilities
-# Device: OS, {app}, address
-# Subnet: set of devices
-# Network: set of subnet
-# Exploit: vulnerability, OS, app
-# workflow: source, test, size(# of steps)
-# OS: Id, type, version, vulnerabilities
-# Vulnerability
+- App: Id, type, vulneralbility, version
+- OS: ID, type, version, vulnerabilities
+- Device: OS, {app}, address
+- Subnet: set of devices
+- network: set of subnet
+- explicit: vulnerability, OS, app
+- workflow: source, test, size(# of steps)
+- OS: Id, type, version, vulnerabilities
+- Vulnerability
 
 Files:
 
