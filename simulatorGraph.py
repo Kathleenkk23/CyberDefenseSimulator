@@ -63,7 +63,7 @@ if __name__ == "__main__":
     axs[0].plot(range(numOfIteration), numOfCompromisedDev)
     axs[0].set_xticks(np.arange(min(range(numOfIteration)), max(range(numOfIteration))+1, 2.0))
     axs[0].set_xlim(0, numOfIteration)
-    fig.subplots_adjust(hspace=1)
+    fig.subplots_adjust(hspace=2)
     
     
     
@@ -108,6 +108,7 @@ if __name__ == "__main__":
     axs[2].plot(range(1,addApps+1), numOfCompromised2)
     axs[2].set_xticks(np.arange(min(range(addApps)), max(range(addApps))+1, 1.0))
     axs[2].set_xlim(0, addApps)
+    fig.subplots_adjust(hspace=1)
     
     
     
