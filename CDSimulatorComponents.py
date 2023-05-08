@@ -4,9 +4,9 @@ import math
 
 
 
-# OS: ID, type, version, vulnerabilities
-
 class OperatingSystem:
+    """Opoerating System (OS) contains ID, type, version, vulnerabilities
+    """
     def __init__(self, id, type, version):
         self.id = id
         self.type = type  # "known", "unknown"
@@ -14,15 +14,34 @@ class OperatingSystem:
         self.vulnerabilities = {}
 
     def getId(self):
+        """return OS ID
+        Returns:
+            int: id of the OS
+        """
         return self.id
 
     def getType(self):
+        """return OS type
+        Returns:
+            str: type of the OS
+        """
         return self.type
 
     def getVersion(self):
+        """return version of the OS
+
+        Returns:
+            str: version of the OS
+        """
         return self.version
 
     def addVulnerability(self, vul):
+        """add vulnerability to the OS, if OS already contains the vulnerbility, no vul will be added
+        else, the vulnerability will be added to the OS
+
+        Args:
+            vul (Vulnerability): specifies vulnerabiltiy to be added
+        """
         if isinstance(vul, Vulnerability):
             if vul in self.vulnerabilities:
                 print("already contain the Vulnerability")
@@ -33,6 +52,12 @@ class OperatingSystem:
             print("not a Vulnerability")
 
     def removeVulnerability(self, vul):
+        """remove vulnerability from the OS, if OS doesn't contains the vulnerbility, no vul will be remove
+        else, the vulnerability will be removed from the OS
+
+        Args:
+            vul (Vulnerability): specifies vulnerabiltiy to be removed
+        """
         if isinstance(vul, Vulnerability):
             if vul.getId() in self.vulnerabilities.keys():
                 self.vulnerabilities.pop(vul.getId())
@@ -43,6 +68,8 @@ class OperatingSystem:
             print("not a Vulnerability")
 
     def getinfo(self):
+        """print info about the OS object, mainly for DEBUGGING
+        """
         stringId = str(self.getId())
         print("OS id: " + stringId)
         print("OS type: " + self.getType())
@@ -52,8 +79,9 @@ class OperatingSystem:
             print("\tvul id: " + str(vul.getId()))
 
 
-# App: Id, type, vulneralbility, version
 class App:
+    """App containing Id, type, vulneralbility, version
+    """
     def __init__(self, id, type, version):
         self.id = id
         self.type = type
@@ -61,15 +89,33 @@ class App:
         self.vulnerabilities = {}
 
     def getId(self):
+        """return App's unique ID
+        Returns:
+            int: id of the App
+        """
         return self.id
 
     def getType(self):
+        """return App type
+        Returns:
+            str: type of the App
+        """
         return self.type
 
     def getVersion(self):
+        """return version of the App
+
+        Returns:
+            str: version of the App
+        """
         return self.version
 
     def addVulnerability(self, vul):
+        """add vulnerability to the App, if App already contains the vulnerbility, no vul will be added
+        else, the vulnerability will be added to the App
+        Args:
+            vul (Vulnerability): specifies vulnerabiltiy to be added
+        """
         if isinstance(vul, Vulnerability):
             if vul in self.vulnerabilities:
                 print("already contain the Vulnerability")
@@ -80,6 +126,12 @@ class App:
             print("not a Vulnerability")
 
     def removeVulnerability(self, vul):
+        """remove vulnerability from the OS, if OS doesn't contains the vulnerbility, no vul will be remove
+        else, the vulnerability will be removed from the OS
+
+        Args:
+            vul (Vulnerability): specifies vulnerabiltiy to be removed
+        """
         if isinstance(vul, Vulnerability):
             if vul.getId() in self.vulnerabilities.keys():
                 self.vulnerabilities.pop(vul.getId())
@@ -90,12 +142,18 @@ class App:
             print("not a Vulnerability")
 
     def getVulnerabilities(self):
+        """get existing vulnerbility(s) from the App
+        Returns:
+            List: List of vulnerabilities returned
+        """
         print("Vulternability of app id {" + self.id + "} includes:")
         for vul in self.vulnerabilities:
             print(vul)
         return self.vulnerabilities
 
     def getinfo(self):
+        """print info about the App object, mainly for DEBUGGING
+        """
         stringId = str(self.getId())
         print("\napp id: " + stringId)
         print("app type: " + self.getType())
@@ -105,8 +163,9 @@ class App:
             print("\tvul id: " + str(vul.getId()))
 
 
-# Device: OS, {app}, address, isCompromised
 class Device:
+    """Device class with ID, OS, {app}, address, isCompromised
+    """
     def __init__(self, id, OS, address):
         self.id = id
         self.OS = OS  # operatingSystem
@@ -115,15 +174,32 @@ class Device:
         self.isCompromised = False
 
     def getId(self):
+        """return Device's unique ID
+        Returns:
+            int: id of the Device
+        """
         return self.id
 
     def getAddress(self):
+        """return Device's unique address
+        Returns:
+            int: addr of the Device
+        """
         return self.address
 
     def getApps(self):
+        """return Device's apps
+        Returns:
+            dict: dictionary of Apps in the Device
+        """
         return self.apps
 
     def addSingleApp(self, appName):
+        """add single App to the device
+
+        Args:
+            appName (App): App to be added
+        """
         if isinstance(appName, App):
             self.apps[appName.getId()] = appName
             # print("app "+str(appName.getId())+" added successfully")
@@ -197,6 +273,8 @@ class Device:
             return False
 
     def getinfo(self):
+        """print info about the Device object, mainly for DEBUGGING
+        """
         stringId = str(self.getId())
         print("device id: " + stringId)
         print("device address: " + str(self.getAddress()))

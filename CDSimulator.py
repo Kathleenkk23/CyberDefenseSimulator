@@ -323,6 +323,8 @@ class CyberDefenseSimulator:
    
 
     def getinfo(self):
+        """diplay info about the subnet, mainly for debug purpose
+        """
         print("subnet : ")
         for devId, dev in self.subnet.net.items():
             print("\t device id: " + str(dev.getId()))

@@ -35,9 +35,10 @@ if __name__ == "__main__":
     
    
     # test how num of compromised change with time
+    # different parameters to be set
     numOfCompromisedDev = []
     numOfIteration = int(input("num of iterations (suggested 50): "))
-    resetNum = 300
+    resetNum = 300 #number of device to be resetted at each time
     resetStep = 5 #number of step before resetting some devices
     maxVulperApp = 4
     addApps = 6
@@ -46,10 +47,13 @@ if __name__ == "__main__":
     
     simulator.generateSubnet(numOfDevice, addApps, 0, maxVulperApp+1)
     for timeStep in range(0, numOfIteration):
+        # everytime the exploit will be chosen randomly
         ranExploit = simulator.randomSampleGenerator(simulator.exploits)
 
         simulator.attackSubnet(ranExploit)
         numOfCompromisedDev.append(simulator.subnet.getCompromisedNum())
+        
+        #reset some devices only at certain intervals (ex. every 5 time steps)
         if(timeStep%resetStep==0):
             simulator.resetByNumSubnet(resetNum)
             print("num of compromised is now: "+str(simulator.subnet.getCompromisedNum())+
@@ -112,9 +116,5 @@ if __name__ == "__main__":
     
     
     
-    
-    
     plt.show()
     
-    
-    # simulator.plot()
