@@ -2,7 +2,7 @@ import unittest
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from cyberDefenseSimulator import * 
+from CDSimulator import * 
 
 
 class CDSimulator():
@@ -12,10 +12,6 @@ class CDSimulator():
         setUp initialize of different classes
         """
         simulator = CyberDefenseSimulator()
-        
-    def plot(self):
-        num = input("input number: ")
-        print(num)
         
 
 if __name__ == "__main__":
@@ -30,33 +26,64 @@ if __name__ == "__main__":
     maxVulperExp=3
     simulator.generateExploits(20, True, minVulperExp, maxVulperExp)
     
-    # simulator.generateDevice(3)
-    maxVulperApp = 20
-    addApps = 6
-    numOfDevice = 100
+
     
     print(f'exploit size is {simulator.getExploitsSize()}')
     ranExploit = simulator.randomSampleGenerator(simulator.exploits)
     print (ranExploit.getInfo())
     numOfCompromised1 = []
+    
+   
+    # test how num of compromised change with time
+    numOfCompromisedDev = []
+    numOfIteration = 50
+    resetNum = 300
+    resetStep = 5 #number of step before resetting some devices
+    maxVulperApp = 4
+    addApps = 6
+    numOfDevice = 500
+    
+    
+    simulator.generateSubnet(numOfDevice, addApps, 0, maxVulperApp+1)
+    for timeStep in range(0, numOfIteration):
+        ranExploit = simulator.randomSampleGenerator(simulator.exploits)
+
+        simulator.attackSubnet(ranExploit)
+        numOfCompromisedDev.append(simulator.subnet.getCompromisedNum())
+        if(timeStep%resetStep==0):
+            simulator.resetByNumSubnet(resetNum)
+            print("num of compromised is now: "+str(simulator.subnet.getCompromisedNum())+
+                  "\nnum of device is now: " +str(simulator.getSubnetSize()))
+            
+    print(numOfCompromisedDev)
+    fig, axs = plt.subplots(3)
+    fig.suptitle('Cyber Security Simulator')
+    axs[0].set_title("test how num of compromised change with time")
+    axs[0].set(ylabel="# of Compromised Device", xlabel="# of Iteration")
+    axs[0].plot(range(numOfIteration), numOfCompromisedDev)
+    axs[0].set_xticks(np.arange(min(range(numOfIteration)), max(range(numOfIteration))+1, 2.0))
+    axs[0].set_xlim(0, numOfIteration)
+    fig.subplots_adjust(hspace=0.5)
+    
+    
+    
     # test how num of max Vul per App affect the num of compromised
+    # simulator.generateDevice(3)
+    simulator.subnet.resetAllCompromisedSubnet()
+  
     for i in range(1, maxVulperApp+1):
         simulator.generateSubnet(numOfDevice, addApps, 0, i)
         
         simulator.attackSubnet(ranExploit)
         numOfCompromised1.append(simulator.subnet.getCompromisedNum())
-        # print(f'1) number of compromised: {simulator.subnet.getCompromisedNum()}')
-        simulator.subnet.resetCompromisedinSubnet()
-        simulator.resetSubnet()
+        # simulator.subnet.resetAllCompromisedSubnet()
+        simulator.resetAllSubnet()
     
-    fig, axs = plt.subplots(2)
-    fig.suptitle('Cyber Security Simulator')
-    
-    axs[0].set_title("Max Vulnerabilities per App and Number of Compromised Device")
-    axs[0].set(ylabel="# of Compromised Device", xlabel="# Max Vul per App")
-    axs[0].plot(range(1,maxVulperApp+1), numOfCompromised1)
-    axs[0].set_xticks(np.arange(min(range(maxVulperApp)), max(range(maxVulperApp))+1, 1.0))
-    axs[0].set_xlim(0, maxVulperApp)
+    axs[1].set_title("Max Vulnerabilities per App and Number of Compromised Device")
+    axs[1].set(ylabel="# of Compromised Device", xlabel="# Max Vul per App")
+    axs[1].plot(range(1,maxVulperApp+1), numOfCompromised1)
+    axs[1].set_xticks(np.arange(min(range(maxVulperApp)), max(range(maxVulperApp))+1, 1.0))
+    axs[1].set_xlim(0, maxVulperApp)
     fig.subplots_adjust(hspace=0.5)
     
     
@@ -70,15 +97,14 @@ if __name__ == "__main__":
         simulator.attackSubnet(ranExploit)
         currentCompromised = simulator.subnet.getCompromisedNum()
         numOfCompromised2.append(currentCompromised)
-        # print(f'2) number of compromised: {simulator.subnet.getCompromisedNum()}')
-        simulator.resetSubnet()
-        simulator.subnet.resetCompromisedinSubnet()
+        simulator.resetAllSubnet()
 
-    axs[1].set_title("Max num App per device and Number of Compromised Device")
-    axs[1].set(xlabel="# Max Num App per Device", ylabel="# of Compromised Device")
-    axs[1].plot(range(1,addApps+1), numOfCompromised2)
-    axs[1].set_xticks(np.arange(min(range(addApps)), max(range(addApps))+1, 1.0))
-    axs[1].set_xlim(0, addApps)
+
+    axs[2].set_title("Max num App per device and Number of Compromised Device")
+    axs[2].set(xlabel="# Max Num App per Device", ylabel="# of Compromised Device")
+    axs[2].plot(range(1,addApps+1), numOfCompromised2)
+    axs[2].set_xticks(np.arange(min(range(addApps)), max(range(addApps))+1, 1.0))
+    axs[2].set_xlim(0, addApps)
     
     
     

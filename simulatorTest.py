@@ -1,5 +1,5 @@
 import unittest
-from cyberDefenseSimulator import * 
+from CDSimulator import * 
 
 class testSimulator(unittest.TestCase):
     """
