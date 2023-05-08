@@ -4,15 +4,15 @@ A development for a cybersecurity simulation environment that is well suited for
 
 
 Basic Structure
-# App: Id, type, vulneralbility, version
-# OS: ID, type, version, vulnerabilities
-# Device: OS, {app}, address
-# Subnet: set of devices
-# network: set of subnet
-# explicit: vulnerability, OS, app
-# workflow: source, test, size(# of steps)
-# OS: Id, type, version, vulnerabilities
-# Vulnerability
+- App: Id, type, vulneralbility, version
+- OS: ID, type, version, vulnerabilities
+- Device: OS, {app}, address
+- Subnet: set of devices
+- network: set of subnet
+- explicit: vulnerability, OS, app
+- workflow: source, test, size(# of steps)
+- OS: Id, type, version, vulnerabilities
+- Vulnerability
 
 notes feb 6:
 vulnerability: a set
